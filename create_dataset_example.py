@@ -10,8 +10,10 @@ from pathlib import Path
 import cv2
 import h5py
 import numpy as np
-from rpl_vision_utils.utils import img_utils as ImgUtils
+# from rpl_vision_utils.utils import img_utils as ImgUtils
+from deoxys_vision.utils import img_utils as ImgUtils
 
+# python create_dataset_example.py --folder /home/franka_deoxys/data_franka/imgsd_demo
 
 def parse_args():
     parser = argparse.ArgumentParser()

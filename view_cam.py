@@ -41,6 +41,7 @@ def main(camera_id):
     cam=CVCamera(camera_id)
     while cam.isalive:
         frame=cam.get_current_frame()
+        if frame==None: continue
         cv2.imshow("preview", frame) 
         key = cv2.waitKey(20)
         if key == 27: # exit on ESC

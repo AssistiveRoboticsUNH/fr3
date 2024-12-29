@@ -35,7 +35,7 @@ def main():
 
     robot_interface._state_buffer = []
 
-    for i in range(3000):
+    for i in range(30_000):
         start_time = time.time_ns()
 
         action, grasp = input2action(
