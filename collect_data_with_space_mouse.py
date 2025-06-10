@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument("--folder", type=Path, default="/home/franka_deoxys/data_franka/imgsd_demo/")
     parser.add_argument("--controller-type", type=str, default="OSC_POSE")
     parser.add_argument(
-        "--controller-cfg", type=str, default="osc-position-controller.yml"
+        "--controller-cfg", type=str, default="osc-pose-controller.yml"
     )
     
     parser.add_argument("--use-depth", action="store_true", 
@@ -62,7 +62,7 @@ def parse_args():
     parser.add_argument(
         "--product_id",
         type=int,
-        default=50734,
+        default=50746,   #  50770.,  50746
     )
     # robot_config_parse_args(parser)
     return parser.parse_args()
@@ -161,6 +161,7 @@ def main():
             controller_type=controller_type,
         )
         if action is None:
+            # print("noneeeeeeeeeeeeeeeeeeeee")
             break
 
         # set unused orientation dims to 0
@@ -213,19 +214,38 @@ def main():
         # Get img info
 
         for camera_id in camera_ids:
-            img_info = cr_interfaces[camera_id].get_img_info()
-            data[f"camera_{camera_id}"].append(img_info)
+            try:
+                img_info = cr_interfaces[camera_id].get_img_info()
+                data[f"camera_{camera_id}"].append(img_info)
 
-            imgs = cr_interfaces[camera_id].get_img()
-            # print('keys: ', imgs.keys())
-            color_img = imgs["color"][..., ::-1]
-            color_img = cv2.resize(color_img, None, fx=0.5, fy=0.5)
-            data[f"camera_{camera_id}_color"].append(color_img)
+                imgs = cr_interfaces[camera_id].get_img()
+                color_img = imgs["color"][..., ::-1]
+                color_img = cv2.resize(color_img, None, fx=0.5, fy=0.5)
+                data[f"camera_{camera_id}_color"].append(color_img)
 
-            if use_depth:
-                depth_img = imgs["depth"]
-                depth_img = cv2.resize(depth_img, None, fx=0.5, fy=0.5)
-                data[f"camera_{camera_id}_depth"].append(depth_img)
+                if use_depth:
+                    depth_img = imgs["depth"]
+                    depth_img = cv2.resize(depth_img, None, fx=0.5, fy=0.5)
+                    data[f"camera_{camera_id}_depth"].append(depth_img)
+            except Exception as e:
+                logger.error(f"Error with camera {camera_id}: {e}")
+                continue
+
+
+        # for camera_id in camera_ids:
+        #     img_info = cr_interfaces[camera_id].get_img_info()
+        #     data[f"camera_{camera_id}"].append(img_info)
+
+        #     imgs = cr_interfaces[camera_id].get_img()
+        #     # print('keys: ', imgs.keys())
+        #     color_img = imgs["color"][..., ::-1]
+        #     color_img = cv2.resize(color_img, None, fx=0.5, fy=0.5)
+        #     data[f"camera_{camera_id}_color"].append(color_img)
+
+        #     if use_depth:
+        #         depth_img = imgs["depth"]
+        #         depth_img = cv2.resize(depth_img, None, fx=0.5, fy=0.5)
+        #         data[f"camera_{camera_id}_depth"].append(depth_img)
             # cv2.imshow(f'color_img_{camera_id}', color_img)
             # cv2.waitKey(1)
 

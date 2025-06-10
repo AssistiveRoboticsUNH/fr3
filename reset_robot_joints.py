@@ -56,6 +56,7 @@ def main():
         0.8480939705504309,
     ]
 
+
     # This is for varying initialization of joints a little bit to
     # increase data variation.
     reset_joint_positions = [
