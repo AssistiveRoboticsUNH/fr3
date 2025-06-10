@@ -103,7 +103,7 @@ def input_to_action(state, last_state):
         # "joystick": joystick_delta,
         "trigger": [trigger_delta],
         "grip": [grip_delta]
-    }
+    }, (translation + rotation + [trigger_delta])
 
 def main():
     args = parse_args()
@@ -191,12 +191,14 @@ def main():
     last_state = None
 
 
-    empty_action = {
-        "delta_pos": [0.0,0.0,0.0],
-        "delta_rot": [0.0,0.0,0.0],
-        "trigger": [0.0],
-        "grip": [0.0]
-    }
+    # empty_action = {
+    #     "delta_pos": [0.0,0.0,0.0],
+    #     "delta_rot": [0.0,0.0,0.0],
+    #     "trigger": [0.0],
+    #     "grip": [0.0]
+    # }
+    empty_action = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
 
     while i < horizon:
         i += 1
@@ -205,12 +207,12 @@ def main():
         state = oculus_reader.get_transformations_and_buttons()
         action = empty_action
         if last_state is not None:
-            input_action = input_to_action(state, last_state)
-            if input_action is not None:
-                if input_action['grip'][0] > 0:
+            input_action_data, input_action = input_to_action(state, last_state)
+            if input_action_data is not None:
+                if input_action_data['grip'][0] > 0:
                     action = input_action
         last_state = state
-        grasp = action['trigger']
+        grasp = input_action_data['trigger']
 
         if action is None:
             break
