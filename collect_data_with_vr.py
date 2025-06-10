@@ -29,7 +29,6 @@ from deoxys.utils.io_devices import SpaceMouse
 from deoxys.utils.log_utils import get_deoxys_example_logger
 import cv2 
 from threading import Thread
-from 
 
 logger = get_deoxys_example_logger()
 
@@ -103,7 +102,7 @@ def input_to_action(state, last_state):
         # "joystick": joystick_delta,
         "trigger": [trigger_delta],
         "grip": [grip_delta]
-    }, (translation + rotation + [trigger_delta])
+    }, [np.array(translation + rotation) , [trigger_delta]]
 
 def main():
     args = parse_args()
@@ -191,13 +190,14 @@ def main():
     last_state = None
 
 
-    # empty_action = {
-    #     "delta_pos": [0.0,0.0,0.0],
-    #     "delta_rot": [0.0,0.0,0.0],
-    #     "trigger": [0.0],
-    #     "grip": [0.0]
-    # }
-    empty_action = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    empty_action_data = {
+        "delta_pos": [0.0,0.0,0.0],
+        "delta_rot": [0.0,0.0,0.0],
+        "trigger": [0.0],
+        "grip": [0.0]
+    }
+
+    empty_action = np.array([0., 0., 0., 0., 0., 0., -1.0])
 
 
     while i < horizon:
@@ -205,12 +205,15 @@ def main():
         start_time = time.time_ns()
         
         state = oculus_reader.get_transformations_and_buttons()
+        print("STATE: ", state)
         action = empty_action
+        input_action_data = empty_action_data
         if last_state is not None:
             input_action_data, input_action = input_to_action(state, last_state)
             if input_action_data is not None:
                 if input_action_data['grip'][0] > 0:
-                    action = input_action
+                    # action = input_action
+                    pass
         last_state = state
         grasp = input_action_data['trigger']
 
@@ -222,12 +225,14 @@ def main():
             action[3:5] = 0.0
         elif controller_type == "OSC_POSITION":
             action[3:6] = 0.0
-
+        
+        print("ROBOT ACTION: ", action)
         robot_interface.control(
             controller_type=controller_type,
             action=action,
             controller_cfg=controller_cfg,
         )
+        print("contolled")
 
         if len(robot_interface._state_buffer) == 0:
             continue
@@ -266,20 +271,20 @@ def main():
         # data["gripper_states"].append(np.array(last_gripper_state.width))
         # Get img info
 
-        for camera_id in camera_ids:
-            img_info = cr_interfaces[camera_id].get_img_info()
-            data[f"camera_{camera_id}"].append(img_info)
+        # for camera_id in camera_ids:
+        #     img_info = cr_interfaces[camera_id].get_img_info()
+        #     data[f"camera_{camera_id}"].append(img_info)
 
-            imgs = cr_interfaces[camera_id].get_img()
-            # print('keys: ', imgs.keys())
-            color_img = imgs["color"][..., ::-1]
-            color_img = cv2.resize(color_img, None, fx=0.5, fy=0.5)
-            data[f"camera_{camera_id}_color"].append(color_img)
+        #     imgs = cr_interfaces[camera_id].get_img()
+        #     # print('keys: ', imgs.keys())
+        #     color_img = imgs["color"][..., ::-1]
+        #     color_img = cv2.resize(color_img, None, fx=0.5, fy=0.5)
+        #     data[f"camera_{camera_id}_color"].append(color_img)
 
-            if use_depth:
-                depth_img = imgs["depth"]
-                depth_img = cv2.resize(depth_img, None, fx=0.5, fy=0.5)
-                data[f"camera_{camera_id}_depth"].append(depth_img)
+        #     if use_depth:
+        #         depth_img = imgs["depth"]
+        #         depth_img = cv2.resize(depth_img, None, fx=0.5, fy=0.5)
+        #         data[f"camera_{camera_id}_depth"].append(depth_img)
             # cv2.imshow(f'color_img_{camera_id}', color_img)
             # cv2.waitKey(1)
 
@@ -299,46 +304,46 @@ def main():
 
     # cv2.destroyAllWindows()
         
-    os.makedirs(folder, exist_ok=True)
-    with open(f"{folder}/config.json", "w") as f:
-        config_dict = {
-            "controller_cfg": dict(controller_cfg),
-            "controller_type": controller_type,
-        }
-        json.dump(config_dict, f)
-        np.savez(f"{folder}/testing_demo_action", data=np.array(data["action"]))
-        np.savez(f"{folder}/testing_demo_ee_states", data=np.array(data["ee_states"]))
-        np.savez(
-            f"{folder}/testing_demo_joint_states", data=np.array(data["joint_states"])
-        )
-        np.savez(
-            f"{folder}/testing_demo_gripper_states",
-            data=np.array(data["gripper_states"]),
-        )
+    # os.makedirs(folder, exist_ok=True)
+    # with open(f"{folder}/config.json", "w") as f:
+    #     config_dict = {
+    #         "controller_cfg": dict(controller_cfg),
+    #         "controller_type": controller_type,
+    #     }
+    #     json.dump(config_dict, f)
+    #     np.savez(f"{folder}/testing_demo_action", data=np.array(data["action"]))
+    #     np.savez(f"{folder}/testing_demo_ee_states", data=np.array(data["ee_states"]))
+    #     np.savez(
+    #         f"{folder}/testing_demo_joint_states", data=np.array(data["joint_states"])
+    #     )
+    #     np.savez(
+    #         f"{folder}/testing_demo_gripper_states",
+    #         data=np.array(data["gripper_states"]),
+    #     )
 
-    for camera_id in camera_ids:
-        np.savez(
-            f"{folder}/testing_demo_camera_{camera_id}_color",
-            data=np.array(data[f"camera_{camera_id}_color"]),
-        )
-        if use_depth:
-            np.savez(
-                f"{folder}/testing_demo_camera_{camera_id}_depth",
-                data=np.array(data[f"camera_{camera_id}_depth"]),
-            )
+    # for camera_id in camera_ids:
+    #     np.savez(
+    #         f"{folder}/testing_demo_camera_{camera_id}_color",
+    #         data=np.array(data[f"camera_{camera_id}_color"]),
+    #     )
+    #     if use_depth:
+    #         np.savez(
+    #             f"{folder}/testing_demo_camera_{camera_id}_depth",
+    #             data=np.array(data[f"camera_{camera_id}_depth"]),
+    #         )
 
 
-    for camera_id in camera_ids:
-        np.savez(
-            f"{folder}/testing_demo_camera_{camera_id}",
-            data=np.array(data[f"camera_{camera_id}"]),
-        )
-        cr_interfaces[camera_id].stop()
-    robot_interface.close()
-    print("Total length of the trajectory: ", len(data["action"]))
-    # beep_end()
-    tb=Thread(target=beep_end)
-    tb.start()
+    # for camera_id in camera_ids:
+    #     np.savez(
+    #         f"{folder}/testing_demo_camera_{camera_id}",
+    #         data=np.array(data[f"camera_{camera_id}"]),
+    #     )
+    #     cr_interfaces[camera_id].stop()
+    # robot_interface.close()
+    # print("Total length of the trajectory: ", len(data["action"]))
+    # # beep_end()
+    # tb=Thread(target=beep_end)
+    # tb.start()
     
 
 if __name__ == "__main__":

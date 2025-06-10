@@ -1,4 +1,4 @@
-from buttons_parser import parse_buttons
+from .buttons_parser import parse_buttons
 import numpy as np
 import threading
 import time
