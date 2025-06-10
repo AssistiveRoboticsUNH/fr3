@@ -26,8 +26,8 @@ def parse_args():
     parser.add_argument(
         "--folder", type=Path, default="data_collection_example/example_data"
     )
-    parser.add_argument("--img-h", type=int, default=224)
-    parser.add_argument("--img-w", type=int, default=224)
+    parser.add_argument("--img-h", type=int, default=480)
+    parser.add_argument("--img-w", type=int, default=640)
     parser.add_argument("--use-depth", action="store_true")
     args = parser.parse_args()
     return args
@@ -59,6 +59,7 @@ def main():
     grp.attrs["camera_ids"] = camera_ids
 
     camera_name_conversion_dict = {0: "agentview_rgb", 1: "eye_in_hand_rgb"}
+    
 
     if args.img_w == 224:
         fx_fy_dict = {0: {"fx": 0.35, "fy": 0.35}, 1: {"fx": 0.4, "fy": 0.6}}
@@ -76,7 +77,7 @@ def main():
 
     screenshots = {}
     for (run_idx, path) in enumerate(Path(folder).glob("run*")):
-        print(run_idx)
+        print(run_idx, path)
 
         screenshots[run_idx] = None
         num_demos += 1
@@ -117,10 +118,13 @@ def main():
         depth_data = {}
         if use_depth:
             for camera_id in camera_ids:
-                depth_data[camera_id] = np.load(
-                    f"{path}/testing_demo_camera_{camera_id}_depth.npz", allow_pickle=True
-                )["data"]
-                # print('load shape ', depth_data[camera_id].shape)
+                try:
+                    depth_data[camera_id] = np.load(
+                        f"{path}/testing_demo_camera_{camera_id}_depth.npz", allow_pickle=True
+                    )["data"]
+                    # print('load shape ', depth_data[camera_id].shape)
+                except Exception as e:
+                    print('error', e)
 
         assert len(ee_states_data) == len(
             action_data
@@ -169,7 +173,10 @@ def main():
                 # image_name = f"{img_folder}/camera_{camera_id}_img_{i}"
  
                 # print('camera_id', camera_id, 'shape: ', camera_data[camera_id].shape, i)
-                resized_img=camera_data[camera_id][i] 
+                resized_img=camera_data[camera_id][i]
+                # resized_img = cv2.resize(resized_img, None, fx=0.5, fy=0.5)
+                # print(resized_img.shape)
+
                 # cv2.imwrite(new_image_name, cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB))
                 image_color_data[camera_id].append(resized_img)
                 # print(resized_img.shape)

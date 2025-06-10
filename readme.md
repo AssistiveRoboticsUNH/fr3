@@ -11,6 +11,10 @@
 ### Step 2: init franka control (use this)
 ```bash
 ssh carl@172.16.0.3
+
+(optional) # check performance mode
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
 ./franka_init.sh        #give password when asked
 ```
 
@@ -26,9 +30,10 @@ python3 reset_robot_joints.py
 Spacemouse
 ```
 cd fr3
-python3 run_deoxys_with_space_mouse.py
+python3 run_deoxys_with_space_mouse.py --product-id 50746
 ```
-
+to use wireless space mpuse 
+ python3 run_deoxys_with_space_mouse.py --product-id 50770
 ### Step 4: Init cameras
 ```
 in fr3 
@@ -54,10 +59,13 @@ redis-cli keys '*'
 ### Step 5: collect data
 ```
 conda deactivate
-python3 fr3/collect_data_with_space_mouse.py
+python3 collect_data_with_space_mouse.py
 
 python3 fr3/collect_data_with_space_mouse.py --use-depth
 ```
+
+see the data here: /home/franka_deoxys/data_franka/imgsd_demo/
+
 
 ### Step 6: data post process
 ```
@@ -84,6 +92,7 @@ franka_deoxys@carl-rog:~/deoxys_control/data_ipynb$ python3 hdf5_2video.py --fil
 
 ```
  
+sudo apt install usb-creator-gtk
 
 ### collect image data v2 (realsense images)
 ```

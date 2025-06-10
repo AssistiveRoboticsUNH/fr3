@@ -7,7 +7,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+import sys 
+sys.path.append("/home/franka_deoxys/deoxys_control/deoxys")
 from deoxys import config_root
 from deoxys.experimental.motion_utils import reset_joints_to
 from deoxys.franka_interface import FrankaInterface
