@@ -23,8 +23,15 @@ def input_to_action(state, last_state):
 
     pose1 = last_pose_data['r']
     pose2 = state_pose_data['r']
+
+    np.set_printoptions(precision=2)
+    print("STATE R: \n", pose2)
+
     delta_pose = np.linalg.inv(pose1) @ pose2
+    print("DS: \n", delta_pose)
+
     translation = delta_pose[:3, 3]
+    print("T: ", translation)
     rotation_matrix = delta_pose[:3, :3]
     rotation = R.from_matrix(rotation_matrix).as_euler('xyz')
 
@@ -40,16 +47,36 @@ def input_to_action(state, last_state):
         grip_delta = 1
     else:
         grip_delta = -1
-    print("RAW: ", translation, rotation)
-    print("CONCATTED: ", [*translation, *rotation])
+    # print("RAW: ", translation, rotation)
+    # print("CONCATTED: ", [*translation, *rotation])
+
+    # translation = [0.0, 0.02, 0.0] #Z , X, Y actualy rotation?
+    # rotation = [0.0, 0.0, 0.0] #Z 0.1, # X 0.1 , Y 0.1 
+
+    rotation_scale = 3
+    translation_scale = 70
+
+    rotation = [
+        rotation[1] * rotation_scale, # Z rotation
+        rotation[0] * rotation_scale * 0.8, # X rotation
+        -rotation[2] * rotation_scale # Y rotation
+    ]
+
+    translation = [
+        translation[1] * translation_scale / 2 * 5, # Z / forward backward
+        translation[0] * translation_scale,  # X / left right
+        -translation[2] * translation_scale # Y / up down
+    ]
+
+
     return ({
         "delta_pos": translation,
         "delta_rot": rotation,
         # "joystick": joystick_delta,
         "trigger": [trigger_delta],
         "grip": [grip_delta]
-    # }, np.array([*translation, *rotation, trigger_delta]))
-    }, np.array([*rotation, *translation, trigger_delta]))
+    }, np.array([*translation, *rotation, trigger_delta]))
+    # }, np.array([*rotation, *translation, trigger_delta]))
 
 def main():
 
@@ -80,8 +107,11 @@ def main():
     }
     empty_action = np.array([0., 0., 0., 0., 0., 0., -1.0])
     last_state = None
+    last_trigger = -1.0
     for i in range(30_000):
-        start_time = time.time_ns()
+        empty_action[6] = last_trigger
+        # start_time = time.time_ns()
+        # time.sleep(0.01)
         state = oculus_reader.get_transformations_and_buttons()
         # action, grasp = input2action(
         #     device=device,
@@ -93,27 +123,31 @@ def main():
         if last_state is not None:
             input_action_data, input_action = input_to_action(state, last_state)
             # print("DATA1: ", input_action_data)
-            # print("DATA2: ", input_action)
+            print("DATA2: ", input_action)
             if input_action_data is not None:
                 # print("NOT NONE")
                 if input_action_data['grip'][0] > 0:
+
+
+                    # action = np.array([0.0,0.0001,0.0,0.0,0.0,0.0,0.0])
                     action = input_action
-                    pass
+                    last_trigger = input_action[6]
+                    # pass
         last_state = state
         # grasp = input_action_data['trigger']
         # print("ROBOT ACTION1: ", action)
-        action = action * 7
+        # action = action * 7
         # action = [0.0,0.0,0.0,0.0,0.0,0.0,action[6]]
-        # print("ROBOT ACTION2: ", action)
+        print("ROBOT ACTION2: ", action)
 
         robot_interface.control(
             controller_type=controller_type,
             action=action,
             controller_cfg=controller_cfg,
         )
-        end_time = time.time_ns()
-        logger.debug(f"Time duration: {((end_time - start_time) / (10**9))}")
-        logger.info(f"Current Robot joint: {np.round(robot_interface.last_q, 3)}")
+        # end_time = time.time_ns()
+        # logger.debug(f"Time duration: {((end_time - start_time) / (10**9))}")
+        # logger.info(f"Current Robot joint: {np.round(robot_interface.last_q, 3)}")
 
     robot_interface.control(
         controller_type=controller_type,
