@@ -157,6 +157,9 @@ def main():
         start_time = time.time_ns()
         action, last_state, last_trigger = read_vr_action(oculus_reader, last_state, last_trigger)
 
+        if a_button:
+            break
+
         robot_interface.control(
             controller_type=controller_type,
             action=action,
