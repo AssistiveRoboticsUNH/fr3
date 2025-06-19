@@ -87,8 +87,8 @@ python3 examples/demo_collection/data_collection2_imgs.py
 python3 examples/reset_robot_joints.py 
 #not python3 examples/demo_collection/create_dataset2.py --folder /home/franka_deoxys/data_franka/lift_blue
 
-# python3 examples/create_dataset_example2.py --folder /home/franka_deoxys/data_franka/imgs_demo/
-franka_deoxys@carl-rog:~/deoxys_control/data_ipynb$ python3 hdf5_2video.py --file /home/franka_deoxys/data_franka/imgs_demo/demo.hdf5
+# python3 create_dataset_example22.py --folder /home/franka_deoxys/data_franka/imgsd_demo
+franka_deoxys@carl-rog:~/deoxys_control/data_ipynb$ python3 hdf5_2video.py --file /home/franka_deoxys/data_franka/imgsd_demo/demo.hdf5
 
 ```
  

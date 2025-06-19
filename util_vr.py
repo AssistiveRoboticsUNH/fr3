@@ -35,8 +35,10 @@ def input_to_action(state, last_state):
     else:
         grip_delta = -1
 
-    rotation_scale = 3
-    translation_scale = 70
+    A_button = state_input_data['A']
+        
+    rotation_scale = 8
+    translation_scale = 90
 
     rotation = [
         rotation[1] * rotation_scale, # Z rotation
@@ -56,7 +58,8 @@ def input_to_action(state, last_state):
         "delta_rot": rotation,
         # "joystick": joystick_delta,
         "trigger": [trigger_delta],
-        "grip": [grip_delta]
+        "grip": [grip_delta],
+        "A_button": A_button
     }, np.array([*translation, *rotation, trigger_delta]))
 
 ###########################################################
@@ -69,7 +72,8 @@ def read_vr_action(oculus_reader, last_state, last_trigger):
         "delta_pos": [0.0,0.0,0.0],
         "delta_rot": [0.0,0.0,0.0],
         "trigger": [0.0],
-        "grip": [0.0]
+        "grip": [0.0],
+        "A_button": False
     }
     empty_action = np.array([0., 0., 0., 0., 0., 0., -1.0])
 
@@ -79,14 +83,16 @@ def read_vr_action(oculus_reader, last_state, last_trigger):
     state = oculus_reader.get_transformations_and_buttons()
     
     action = empty_action
+    A_button = False
     input_action_data = empty_action_data
     if last_state is not None:
         input_action_data, input_action = input_to_action(state, last_state)
         if input_action_data is not None:
+            A_button = input_action_data['A_button']
             if input_action_data['grip'][0] > 0:
                 action = input_action
                 last_trigger = input_action[6]
                 # pass
     last_state = state
 
-    return action, last_state, last_trigger
+    return action, last_state, last_trigger, A_button

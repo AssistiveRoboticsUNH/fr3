@@ -15,12 +15,23 @@ from oculus_reader.reader import OculusReader
 from deoxys_vision.networking.camera_redis_interface import CameraRedisSubInterface
 from threading import Thread
 import json
+from pathlib import Path
+import cv2 
 
 logger = get_deoxys_example_logger()
 
+from playsound import playsound
+
 import beepy as beep
-beep_start = lambda : beep.beep('coin')
-beep_end= lambda : beep.beep('ready')
+# beep_start = lambda : beep.beep('coin')
+# beep_end= lambda : beep.beep('ready')
+
+def beep_start():
+    playsound("/home/franka_deoxys/miniconda3/lib/python3.12/site-packages/beepy/audio_data/coin.wav")
+
+def beep_end():
+    playsound("/home/franka_deoxys/miniconda3/lib/python3.12/site-packages/beepy/audio_data/ready.wav")
+
 
 ###########################################################
 # Funtion read read parse and return command line arguemnts
@@ -155,9 +166,9 @@ def main():
     while i < horizon:
         i += 1
         start_time = time.time_ns()
-        action, last_state, last_trigger = read_vr_action(oculus_reader, last_state, last_trigger)
+        action, last_state, last_trigger, A_button = read_vr_action(oculus_reader, last_state, last_trigger)
 
-        if a_button:
+        if A_button:
             break
 
         robot_interface.control(
@@ -172,22 +183,28 @@ def main():
 
         data["action"].append(action)
         state_dict = {
-            "ee_states": np.array(last_state.O_T_EE),
-            "joint_states": np.array(last_state.q),
-            "gripper_states": np.array(last_trigger),
+            "ee_states": np.array(robot_interface._state_buffer[-1].O_T_EE),
+            "joint_states": np.array(robot_interface._state_buffer[-1].q),
+            "gripper_states": np.array(robot_interface._gripper_state_buffer[-1].width),
         }
 
+        # print("STATE DICT: ", state_dict)
 
 
-        if previous_state_dict is not None:
-            for proprio_key in state_dict.keys():
-                proprio_state = state_dict[proprio_key]
-                if np.sum(np.abs(proprio_state)) <= 1e-6:
-                    proprio_state = previous_state_dict[proprio_key]
-                state_dict[proprio_key] = np.copy(proprio_state)
+        # print("PREV STATE: ", previous_state_dict)
+        # try:
+        #     if previous_state_dict is not None:
+        #         for proprio_key in state_dict.keys():
+        #             proprio_state = state_dict[proprio_key]
+        #             if np.sum(np.abs(proprio_state)) <= 1e-6:
+        #                 proprio_state = previous_state_dict[proprio_key]
+        #             state_dict[proprio_key] = np.copy(proprio_state)
         for proprio_key in state_dict.keys():
             data[proprio_key].append(state_dict[proprio_key])
-
+        # except Exception as e:
+        #     print("ERROR: ", e)
+            
+    
         previous_state_dict = state_dict
 
         for camera_id in camera_ids:
@@ -214,7 +231,6 @@ def main():
     ###########################################################
     # Save recorded states to file
     ###########################################################
-    
     os.makedirs(folder, exist_ok=True)
     with open(f"{folder}/config.json", "w") as f:
         config_dict = {

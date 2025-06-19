@@ -20,6 +20,7 @@ logger = get_deoxys_example_logger()
 
 # Current Robot joint: [-0.007  0.131 -0.127 -2.519  0.017  2.558  0.623]
 # Current Robot joint: [ 0.084  0.086 -0.021 -2.27   0.008  2.326  2.476]
+# Current Robot joint: [ 0.057 -0.026  0.012 -2.289  0.015  2.253  2.461]
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -46,7 +47,8 @@ def main():
     controller_type = "JOINT_POSITION"
 
     # rotated 90 degree, open gripper
-    reset_joint_positions = [ 0.088 ,  -0.087  ,0.14  ,-2.28 ,  0.039  ,2.198  ,2.537]
+    # reset_joint_positions = [ 0.088 ,  -0.087  ,0.14  ,-2.28 ,  0.039  ,2.198  ,2.537]
+    reset_joint_positions = [ 0.057, -0.026,  0.012 ,-2.289 , 0.015 , 2.253 , 2.461]
 
     # This is for varying initialization of joints a little bit to
     # increase data variation.

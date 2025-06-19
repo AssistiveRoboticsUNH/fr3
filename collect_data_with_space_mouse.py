@@ -31,10 +31,19 @@ from threading import Thread
 
 logger = get_deoxys_example_logger()
 
-
+from playsound import playsound
 import beepy as beep
-beep_start = lambda : beep.beep('coin')
-beep_end= lambda : beep.beep('ready')
+# beep_start = lambda : beep.beep('coin')
+
+# beep_start = lambda : os.system('echo -n "\a"')
+
+# beep_end= lambda : beep.beep('ready')
+
+def beep_start():
+    playsound("/home/franka_deoxys/miniconda3/lib/python3.12/site-packages/beepy/audio_data/coin.wav")
+
+def beep_end():
+    playsound("/home/franka_deoxys/miniconda3/lib/python3.12/site-packages/beepy/audio_data/ready.wav")
 
 
 def parse_args():

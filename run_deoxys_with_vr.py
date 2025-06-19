@@ -38,7 +38,7 @@ def main():
     last_state = None
     last_trigger = -1.0
     for i in range(30_000):
-        action, last_state, last_trigger = read_vr_action(oculus_reader, last_state, last_trigger)
+        action, last_state, last_trigger, A_button = read_vr_action(oculus_reader, last_state, last_trigger)
 
         robot_interface.control(
             controller_type=controller_type,
