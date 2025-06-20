@@ -32,9 +32,13 @@ from threading import Thread
 logger = get_deoxys_example_logger()
 
 
-import beepy as beep
-beep_start = lambda : beep.beep('coin')
-beep_end= lambda : beep.beep('ready')
+from playsound import playsound
+
+def beep_start():
+    playsound("audio_data/coin.wav")
+
+def beep_end():
+    playsound("audio_data/ready.wav")
 
 
 def parse_args():
