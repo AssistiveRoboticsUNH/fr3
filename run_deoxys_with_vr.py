@@ -40,6 +40,16 @@ def main():
     for i in range(30_000):
         action, last_state, last_trigger, A_button = read_vr_action(oculus_reader, last_state, last_trigger)
 
+        # if len(robot_interface._state_buffer):
+
+        #     last = np.round(robot_interface.last_q, 3)
+        #     print("LAST: ", last[1])
+        #     print("ACTINO: ", action[2])
+
+            # if last[1] >= 0.2 and action[2] < 0:
+            #     action[2] = 0
+
+
         robot_interface.control(
             controller_type=controller_type,
             action=action,

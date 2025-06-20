@@ -39,7 +39,7 @@ def beep_end():
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--interface-cfg", type=str, default="charmander.yml")
-    parser.add_argument("--folder", type=Path, default="/home/franka_deoxys/data_franka/imgsd_demo/")
+    parser.add_argument("--folder", type=Path, default="/home/franka_deoxys/devin-vr/")
     parser.add_argument("--controller-type", type=str, default="OSC_POSE")
     parser.add_argument(
         "--controller-cfg", type=str, default="osc-pose-controller.yml"
@@ -193,12 +193,12 @@ def main():
 
         # print("PREV STATE: ", previous_state_dict)
         # try:
-        #     if previous_state_dict is not None:
-        #         for proprio_key in state_dict.keys():
-        #             proprio_state = state_dict[proprio_key]
-        #             if np.sum(np.abs(proprio_state)) <= 1e-6:
-        #                 proprio_state = previous_state_dict[proprio_key]
-        #             state_dict[proprio_key] = np.copy(proprio_state)
+        if previous_state_dict is not None:
+            for proprio_key in state_dict.keys():
+                proprio_state = state_dict[proprio_key]
+                if np.sum(np.abs(proprio_state)) <= 1e-6:
+                    proprio_state = previous_state_dict[proprio_key]
+                state_dict[proprio_key] = np.copy(proprio_state)
         for proprio_key in state_dict.keys():
             data[proprio_key].append(state_dict[proprio_key])
         # except Exception as e:
@@ -276,17 +276,6 @@ def main():
     # beep_end()
     tb=Thread(target=beep_end)
     tb.start()
-
-
-
-
-
-
-
-
-
-
-
 
 
 

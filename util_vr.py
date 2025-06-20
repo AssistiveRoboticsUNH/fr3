@@ -22,6 +22,9 @@ def input_to_action(state, last_state):
     delta_pose = np.linalg.inv(pose1) @ pose2
 
     translation = delta_pose[:3, 3]
+
+    print("Y: ", translation[2])
+
     rotation_matrix = delta_pose[:3, :3]
     rotation = R.from_matrix(rotation_matrix).as_euler('xyz')
 
@@ -38,7 +41,6 @@ def input_to_action(state, last_state):
     A_button = state_input_data['A']
         
     rotation_scale = 8
-    translation_scale = 90
 
     rotation = [
         rotation[1] * rotation_scale, # Z rotation
@@ -46,12 +48,19 @@ def input_to_action(state, last_state):
         -rotation[2] * rotation_scale # Y rotation
     ]
 
+    translation_scale = 70
+    translation_sum = abs(translation[0]) + abs(translation[1]) + abs(translation[2])
+
+    if translation_sum < 0.8:
+        translation_scale = 150
+
     translation = [
-        translation[1] * translation_scale / 2 * 5, # Z / forward backward
-        translation[0] * translation_scale,  # X / left right
+        translation[1] * translation_scale / 2 * 5 , # Z / forward backward
+        translation[0] * translation_scale * 1.2,  # X / left right
         -translation[2] * translation_scale # Y / up down
     ]
 
+    # print("SUM: ", translation_sum)
 
     return ({
         "delta_pos": translation,
