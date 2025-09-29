@@ -59,6 +59,11 @@ def parse_args():
         default=1000,
     )
     parser.add_argument(
+        "--use_depth",
+        type=bool,
+        default=True,
+    )
+    parser.add_argument(
         "--vendor_id",
         type=int,
         default=9583,
@@ -66,7 +71,7 @@ def parse_args():
     parser.add_argument(
         "--product_id",
         type=int,
-        default=50746.,
+        default=50746,
     )
     # robot_config_parse_args(parser)
     return parser.parse_args()
@@ -75,7 +80,9 @@ def parse_args():
 def main():
     args = parse_args()
 
-    use_depth = args.use_depth
+    # use_depth = args.use_depth
+    use_depth = True
+    print(f'-----------collecting data with {use_depth} use_depth')
     horizon = args.horizon 
 
     print(f'-----------collecting data with {horizon} max steps')
@@ -135,7 +142,9 @@ def main():
 
     previous_state_dict = None
     # reset_joint_positions = [0.034,0.109,-0.012,-1.63,0.005,1.776,0.696] # candy 60,80
-    reset_joint_positions = [-0.048,0.07,0.007,-1.429,-0.007,1.548,0.72 ]
+    # reset_joint_positions = [-0.048,0.07,0.007,-1.429,-0.007,1.548,0.72 ]
+    # reset_joint_positions =[0.08847484112516484 , -1.4669655020729158 , 0.09615693060232094 , -2.526673189835611 , -0.05765999935182018 , 1.4653095684956001 , 0.8837111350824987]
+    reset_joint_positions = [ 0.044, -0.797,  0.09,  -2.308, -0.006,  1.703,  0.826]
     reset_joints_to(robot_interface, reset_joint_positions, gripper_open=True)
 
 

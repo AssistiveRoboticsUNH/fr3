@@ -28,6 +28,7 @@ from deoxys.utils.io_devices import SpaceMouse
 from deoxys.utils.log_utils import get_deoxys_example_logger
 import cv2 
 from threading import Thread
+from deoxys.experimental.motion_utils import reset_joints_to
 
 logger = get_deoxys_example_logger()
 
@@ -49,7 +50,7 @@ def beep_end():
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--interface-cfg", type=str, default="charmander.yml")
-    parser.add_argument("--folder", type=Path, default="/home/franka_deoxys/data_franka/imgsd_demo/")
+    parser.add_argument("--folder", type=Path, default="/home/franka_deoxys/devin-vr/")
     parser.add_argument("--controller-type", type=str, default="OSC_POSE")
     parser.add_argument(
         "--controller-cfg", type=str, default="osc-pose-controller.yml"
@@ -314,6 +315,9 @@ def main():
     # beep_end()
     tb=Thread(target=beep_end)
     tb.start()
+
+    # reset_joint_positions =[ 0.057, -0.026,  0.012 ,-2.289 , 0.015 , 2.253 , 2.461]
+    # reset_joints_to(robot_interface, reset_joint_positions, gripper_open=True)
     
 
 if __name__ == "__main__":

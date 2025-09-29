@@ -48,7 +48,10 @@ def main():
 
     # rotated 90 degree, open gripper
     # reset_joint_positions = [ 0.088 ,  -0.087  ,0.14  ,-2.28 ,  0.039  ,2.198  ,2.537]
+
+
     reset_joint_positions = [ 0.057, -0.026,  0.012 ,-2.289 , 0.015 , 2.253 , 2.461]
+    # reset_joint_positions = [ 0.057, -0.026,  0.012 ,-2.289 , 0.015 , 2.253, -0.659]
 
     # This is for varying initialization of joints a little bit to
     # increase data variation.

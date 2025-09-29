@@ -21,14 +21,14 @@ def main():
     port = 6379
 
     # camera_info = EasyDict(camera_id=camera_id, camera_name='webcam', camera_type='webcam')
-    camera_info = EasyDict(camera_id=camera_id, camera_name='camera_rs_0', camera_type='rs')
+    camera_info = EasyDict(camera_id=camera_id, camera_name='camera_rs_1', camera_type='rs')
     camera2redis_sub_interface = CameraRedisSubInterface(
         redis_host=host, redis_port=port, camera_info=camera_info
     ) 
 
     camera2redis_sub_interface.start()
 
-    for i in range(1000):
+    while True:
         img_info = camera2redis_sub_interface.get_img()
         frame = img_info['color']
         # if frame==None:

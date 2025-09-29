@@ -28,6 +28,12 @@ def input_to_action(state, last_state):
     rotation_matrix = delta_pose[:3, :3]
     rotation = R.from_matrix(rotation_matrix).as_euler('xyz')
 
+    if(state_input_data['leftGrip'][0] > 0):
+        enable_delta = True
+    else:
+        enable_delta = False
+
+
     if(state_input_data['rightTrig'][0] > 0):
         trigger_delta = 1
     else:
@@ -42,9 +48,15 @@ def input_to_action(state, last_state):
         
     rotation_scale = 8
 
+    flipped = True
+
+    flippedConst = 1
+    if flipped:
+        flippedConst = -1
+
     rotation = [
-        rotation[1] * rotation_scale, # Z rotation
-        rotation[0] * rotation_scale * 0.8, # X rotation
+        rotation[1] * flippedConst * rotation_scale, # Z rotation
+        rotation[0] * flippedConst * rotation_scale * 0.8, # X rotation
         -rotation[2] * rotation_scale # Y rotation
     ]
 
@@ -55,8 +67,8 @@ def input_to_action(state, last_state):
         translation_scale = 150
 
     translation = [
-        translation[1] * translation_scale / 2 * 5 , # Z / forward backward
-        translation[0] * translation_scale * 1.2,  # X / left right
+        translation[1] * flippedConst * translation_scale / 2 * 5 , # Z / forward backward
+        translation[0] * flippedConst * translation_scale * 1.2,  # X / left right
         -translation[2] * translation_scale # Y / up down
     ]
 
@@ -68,7 +80,8 @@ def input_to_action(state, last_state):
         # "joystick": joystick_delta,
         "trigger": [trigger_delta],
         "grip": [grip_delta],
-        "A_button": A_button
+        "A_button": A_button,
+        "enable": enable_delta
     }, np.array([*translation, *rotation, trigger_delta]))
 
 ###########################################################
@@ -82,7 +95,8 @@ def read_vr_action(oculus_reader, last_state, last_trigger):
         "delta_rot": [0.0,0.0,0.0],
         "trigger": [0.0],
         "grip": [0.0],
-        "A_button": False
+        "A_button": False,
+        "enable": False
     }
     empty_action = np.array([0., 0., 0., 0., 0., 0., -1.0])
 
@@ -93,12 +107,17 @@ def read_vr_action(oculus_reader, last_state, last_trigger):
     
     action = empty_action
     A_button = False
+    enable = False
     input_action_data = empty_action_data
     if last_state is not None:
         input_action_data, input_action = input_to_action(state, last_state)
         if input_action_data is not None:
             A_button = input_action_data['A_button']
-            if input_action_data['grip'][0] > 0:
+            
+            enable = input_action_data['enable']
+            # enable = True
+
+            if input_action_data['grip'][0] > 0 and enable:
                 action = input_action
                 last_trigger = input_action[6]
                 # pass

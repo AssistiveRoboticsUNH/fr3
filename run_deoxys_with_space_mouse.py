@@ -24,7 +24,7 @@ def main():
 
     args = parser.parse_args()
 
-    device = SpaceMouse(vendor_id=args.vendor_id, product_id=args.product_id)
+    device = SpaceMouse(vendor_id=9583, product_id=50746)
     device.start_control()
 
     robot_interface = FrankaInterface(args.interface_cfg, use_visualizer=False)

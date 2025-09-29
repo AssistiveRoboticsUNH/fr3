@@ -71,7 +71,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main(args)
 
-# python3 hdf5_2video.py --file /home/franka_deoxys/data_franka/imgs_demo/demo.hdf5
+# python3 hdf5_2video.py --file /home/franka_deoxys/devin-vr/demo.hdf5
 
 # python3 hdf5_2video.py --file /home/franka_deoxys/data_franka/imgsd_demo/demo.hdf5
 

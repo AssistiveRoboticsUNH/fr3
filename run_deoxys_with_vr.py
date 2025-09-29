@@ -57,7 +57,7 @@ def main():
         )
         # end_time = time.time_ns()
         # logger.debug(f"Time duration: {((end_time - start_time) / (10**9))}")
-        # logger.info(f"Current Robot joint: {np.round(robot_interface.last_q, 3)}")
+        logger.info(f"Current Robot joint: {np.round(robot_interface.last_q, 3)}")
 
     robot_interface.control(
         controller_type=controller_type,

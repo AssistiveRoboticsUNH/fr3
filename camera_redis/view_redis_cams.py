@@ -13,6 +13,9 @@ def main(camera_ids_color, camera_ids_depth):
     camera_ids_color = [int(item) for item in camera_ids_color]
     camera_ids_depth = [int(item) for item in camera_ids_depth]
 
+    # camera_ids_color= [1]
+    # camera_ids_depth = [1]
+
    
 
     print('camera_ids_color:', camera_ids_color)
